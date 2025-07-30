@@ -1,0 +1,10 @@
+<svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="85" y="40" width="70" height="120" rx="8" fill="white" stroke="#E5E5E5" stroke-width="2"/>
+<rect x="90" y="50" width="60" height="90" fill="#F5F5F5"/>
+<circle cx="120" cy="155" r="8" fill="#E5E5E5"/>
+<rect x="100" y="170" width="40" height="4" rx="2" fill="#E5E5E5"/>
+<path d="M120 90L110 110H130L120 90Z" fill="#9E9E9E"/>
+<rect x="115" y="115" width="10" height="20" fill="#9E9E9E"/>
+<circle cx="120" cy="75" r="3" fill="#9E9E9E"/>
+<text x="120" y="200" text-anchor="middle" fill="white" font-family="Arial" font-size="16" font-weight="bold">Mobile Only</text>
+</svg>
