@@ -21,7 +21,11 @@ export default function Home() {
 
   if (showSplash) {
     return (
-      <div className={`fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-green-50 to-white transition-all duration-500 ease-out ${isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-green-50 to-white transition-all duration-500 ease-out ${
+          isTransitioning ? "opacity-0 scale-95" : "opacity-100 scale-100"
+        }`}
+      >
         <div className="text-center">
           <div className="animate-logo-entrance">
             <Image
@@ -33,7 +37,7 @@ export default function Home() {
             />
           </div>
         </div>
-        
+
         <style jsx global>{`
           @keyframes logo-entrance {
             0% {
@@ -49,9 +53,10 @@ export default function Home() {
               opacity: 1;
             }
           }
-          
+
           .animate-logo-entrance {
-            animation: logo-entrance 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: logo-entrance 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)
+              forwards;
           }
         `}</style>
       </div>
@@ -181,7 +186,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      
+
       <style jsx global>{`
         @keyframes fade-in {
           0% {
@@ -193,7 +198,7 @@ export default function Home() {
             transform: translateY(0);
           }
         }
-        
+
         .animate-fade-in {
           animation: fade-in 0.6s ease-out forwards;
         }
