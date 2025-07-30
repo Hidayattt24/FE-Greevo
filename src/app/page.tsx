@@ -2,102 +2,111 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen p-8 pb-20 gap-16 sm:p-20">
+      <main className="flex flex-col gap-8 items-center">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="poppins-black text-4xl sm:text-6xl mb-4">
+            Welcome to Greevo
+          </h1>
+          <p className="poppins-light text-lg sm:text-xl text-gray-600">
+            Demonstrasi penggunaan font Poppins
+          </p>
+        </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        {/* Font Weight Examples */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h3 className="poppins-semibold text-xl mb-3">
+              Font Weights Normal
+            </h3>
+            <div className="space-y-2">
+              <p className="poppins-thin">Poppins Thin (100)</p>
+              <p className="poppins-extralight">Poppins Extra Light (200)</p>
+              <p className="poppins-light">Poppins Light (300)</p>
+              <p className="poppins-regular">Poppins Regular (400)</p>
+              <p className="poppins-medium">Poppins Medium (500)</p>
+              <p className="poppins-semibold">Poppins Semi Bold (600)</p>
+              <p className="poppins-bold">Poppins Bold (700)</p>
+              <p className="poppins-extrabold">Poppins Extra Bold (800)</p>
+              <p className="poppins-black">Poppins Black (900)</p>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h3 className="poppins-semibold text-xl mb-3">
+              Font Weights Italic
+            </h3>
+            <div className="space-y-2">
+              <p className="poppins-thin-italic">Poppins Thin Italic (100)</p>
+              <p className="poppins-extralight-italic">
+                Poppins Extra Light Italic (200)
+              </p>
+              <p className="poppins-light-italic">Poppins Light Italic (300)</p>
+              <p className="poppins-regular-italic">
+                Poppins Regular Italic (400)
+              </p>
+              <p className="poppins-medium-italic">
+                Poppins Medium Italic (500)
+              </p>
+              <p className="poppins-semibold-italic">
+                Poppins Semi Bold Italic (600)
+              </p>
+              <p className="poppins-bold-italic">Poppins Bold Italic (700)</p>
+              <p className="poppins-extrabold-italic">
+                Poppins Extra Bold Italic (800)
+              </p>
+              <p className="poppins-black-italic">Poppins Black Italic (900)</p>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h3 className="poppins-semibold text-xl mb-3">Contoh Penggunaan</h3>
+            <div className="space-y-4">
+              <div>
+                <h4 className="poppins-bold text-lg">Judul Artikel</h4>
+                <p className="poppins-regular text-sm">
+                  Ini adalah contoh paragraf dengan font Poppins regular.
+                </p>
+              </div>
+              <div>
+                <h4 className="poppins-medium text-base">Sub Judul</h4>
+                <p className="poppins-light text-sm">
+                  Teks dengan weight light untuk konten yang lebih ringan.
+                </p>
+              </div>
+              <div className="text-center">
+                <button className="poppins-semibold bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                  Button Example
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sample Content */}
+        <div className="max-w-4xl text-center mt-12">
+          <h2 className="poppins-bold text-3xl mb-6">
+            Semua Font Sudah Siap Digunakan!
+          </h2>
+          <p className="poppins-regular text-lg mb-4">
+            Sekarang Anda dapat menggunakan class-class CSS yang telah dibuat
+            untuk mengatur font weight dan style Poppins di seluruh project
+            Greevo.
+          </p>
+          <p className="poppins-light text-base text-gray-600">
+            Gunakan class seperti{" "}
+            <code className="poppins-medium bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">
+              poppins-bold
+            </code>
+            ,
+            <code className="poppins-medium bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded ml-2">
+              poppins-light-italic
+            </code>
+            , atau class lainnya sesuai kebutuhan desain Anda.
+          </p>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
