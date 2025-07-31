@@ -25,11 +25,7 @@ export default function GetStarted() {
   }, []);
 
   const nextSlide = () => {
-    if (currentSlide < slides.length - 1) {
-      setCurrentSlide(currentSlide + 1);
-    } else {
-      router.push(ROUTES.WELCOME);
-    }
+    router.push(ROUTES.AUTHENTICATION);
   };
 
   const currentSlideData = slides[currentSlide];
@@ -85,9 +81,7 @@ export default function GetStarted() {
                 height: "44px",
                 borderRadius: "20px",
               }}
-              aria-label={
-                currentSlide < slides.length - 1 ? "Next slide" : "Get started"
-              }
+              aria-label="Get started"
             >
               <div
                 className="flex items-center justify-center"
