@@ -3,8 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { MobilePageLayout } from "@/components";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showEXP, setShowEXP] = useState(false);
   const [showBadgeModal, setShowBadgeModal] = useState(false);
@@ -47,7 +49,8 @@ export default function DashboardPage() {
         {/* Header Section */}
         <div className="flex items-start justify-between mb-6">
           {/* Notification Icon */}
-          <div
+          <button
+            onClick={() => router.push("/pages/dashboard/notifications")}
             className="flex items-center justify-center"
             style={{
               width: "46px",
@@ -68,7 +71,7 @@ export default function DashboardPage() {
                 fill="white"
               />
             </svg>
-          </div>
+          </button>
 
           {/* Profile Section */}
           <div className="relative">
