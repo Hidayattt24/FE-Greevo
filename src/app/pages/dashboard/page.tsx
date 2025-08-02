@@ -189,18 +189,12 @@ export default function DashboardPage() {
                   borderRadius: "50%",
                 }}
               >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+                <span
+                  className="material-symbols-outlined text-white"
+                  style={{ fontSize: "20px" }}
                 >
-                  <path
-                    d="M8.59 16.59L13.17 12L8.59 7.41L10 6l6 6-6 6-1.41-1.41z"
-                    fill="white"
-                  />
-                </svg>
+                  arrow_outward
+                </span>
               </div>
             </div>
           </div>
