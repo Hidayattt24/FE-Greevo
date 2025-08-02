@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@lottiefiles/dotlottie-react": "^0.14.4",
+    "@types/canvas-confetti": "^1.9.0",
+    "canvas-confetti": "^1.9.3",
     "next": "15.4.4",
     "react": "19.1.0",
     "react-dom": "19.1.0"

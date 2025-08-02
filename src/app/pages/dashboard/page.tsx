@@ -167,8 +167,9 @@ export default function DashboardPage() {
         {/* Two Cards Section */}
         <div className="flex space-x-4">
           {/* Contribution Card */}
-          <div
-            className="relative p-4 text-white flex flex-col justify-between flex-1"
+          <button
+            onClick={() => router.push("/pages/dashboard/contribution")}
+            className="relative p-4 text-white flex flex-col justify-between flex-1 text-left"
             style={{
               height: "152px",
               borderRadius: "15px",
@@ -200,7 +201,7 @@ export default function DashboardPage() {
                 </span>
               </div>
             </div>
-          </div>
+          </button>
 
           {/* Time Card */}
           <div
