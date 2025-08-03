@@ -10,8 +10,10 @@ export default function DashboardPage() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showEXP, setShowEXP] = useState(false);
   const [showBadgeModal, setShowBadgeModal] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [userEXP, setUserEXP] = useState(0);
-  const [contributionHistory, setContributionHistory] = useState<any[]>([]);
+  const [hasNewNotifications, setHasNewNotifications] = useState(false);
+  const [hasNewBadge, setHasNewBadge] = useState(false);
 
   // Sample data
   const username = "Username";
@@ -27,6 +29,9 @@ export default function DashboardPage() {
   // Load EXP from localStorage
   useEffect(() => {
     const savedEXP = localStorage.getItem("userEXP");
+    const savedNotificationStatus = localStorage.getItem("hasNewNotifications");
+    const savedBadgeStatus = localStorage.getItem("hasNewBadge");
+
     if (savedEXP) {
       setUserEXP(parseInt(savedEXP));
     } else {
@@ -35,31 +40,42 @@ export default function DashboardPage() {
       localStorage.setItem("userEXP", "50");
     }
 
-    const savedHistory = localStorage.getItem("contributionHistory");
-    if (savedHistory) {
-      setContributionHistory(JSON.parse(savedHistory));
+    // Load notification status
+    if (savedNotificationStatus !== null) {
+      setHasNewNotifications(savedNotificationStatus === "true");
     } else {
-      // Set dummy initial contribution history for testing
-      const dummyHistory = [
-        {
-          id: 1,
-          activityTitle: "Buang Sampah",
-          exp: 10,
-          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-          photo: null,
-        },
-        {
-          id: 2,
-          activityTitle: "Pakai Tumbler",
-          exp: 15,
-          timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-          photo: null,
-        },
-      ];
-      setContributionHistory(dummyHistory);
-      localStorage.setItem("contributionHistory", JSON.stringify(dummyHistory));
+      // Set initial notification for demo
+      setHasNewNotifications(true);
+      localStorage.setItem("hasNewNotifications", "true");
+    }
+
+    // Load badge status
+    if (savedBadgeStatus !== null) {
+      setHasNewBadge(savedBadgeStatus === "true");
     }
   }, []);
+
+  // Check for new badge when EXP changes
+  useEffect(() => {
+    if (userEXP > 0) {
+      const savedLastBadgeId = localStorage.getItem("lastBadgeId");
+      const currentBadge =
+        badges.find(
+          (badge) => userEXP >= badge.minEXP && userEXP <= badge.maxEXP
+        ) || badges[0];
+
+      if (savedLastBadgeId) {
+        const lastBadgeId = parseInt(savedLastBadgeId);
+        if (currentBadge.id > lastBadgeId) {
+          setHasNewBadge(true);
+          localStorage.setItem("hasNewBadge", "true");
+        }
+      }
+
+      // Update last badge ID
+      localStorage.setItem("lastBadgeId", currentBadge.id.toString());
+    }
+  }, [userEXP]);
 
   // Update EXP when page becomes visible (when user returns from contribution page)
   useEffect(() => {
@@ -67,12 +83,19 @@ export default function DashboardPage() {
       if (!document.hidden) {
         const savedEXP = localStorage.getItem("userEXP");
         if (savedEXP) {
-          setUserEXP(parseInt(savedEXP));
-        }
+          const newEXP = parseInt(savedEXP);
+          const currentBadge = getCurrentBadge();
+          const newBadge =
+            badges.find(
+              (badge) => newEXP >= badge.minEXP && newEXP <= badge.maxEXP
+            ) || badges[0];
 
-        const savedHistory = localStorage.getItem("contributionHistory");
-        if (savedHistory) {
-          setContributionHistory(JSON.parse(savedHistory));
+          // Check if user earned a new badge
+          if (newBadge.id > currentBadge.id) {
+            setHasNewBadge(true);
+          }
+
+          setUserEXP(newEXP);
         }
       }
     };
@@ -81,12 +104,19 @@ export default function DashboardPage() {
       // Also update when window gets focus (user returns to tab)
       const savedEXP = localStorage.getItem("userEXP");
       if (savedEXP) {
-        setUserEXP(parseInt(savedEXP));
-      }
+        const newEXP = parseInt(savedEXP);
+        const currentBadge = getCurrentBadge();
+        const newBadge =
+          badges.find(
+            (badge) => newEXP >= badge.minEXP && newEXP <= badge.maxEXP
+          ) || badges[0];
 
-      const savedHistory = localStorage.getItem("contributionHistory");
-      if (savedHistory) {
-        setContributionHistory(JSON.parse(savedHistory));
+        // Check if user earned a new badge
+        if (newBadge.id > currentBadge.id) {
+          setHasNewBadge(true);
+        }
+
+        setUserEXP(newEXP);
       }
     };
 
@@ -104,22 +134,24 @@ export default function DashboardPage() {
     const interval = setInterval(() => {
       const savedEXP = localStorage.getItem("userEXP");
       if (savedEXP && parseInt(savedEXP) !== userEXP) {
-        setUserEXP(parseInt(savedEXP));
-      }
+        const newEXP = parseInt(savedEXP);
+        const currentBadge = getCurrentBadge();
+        const newBadge =
+          badges.find(
+            (badge) => newEXP >= badge.minEXP && newEXP <= badge.maxEXP
+          ) || badges[0];
 
-      const savedHistory = localStorage.getItem("contributionHistory");
-      if (savedHistory) {
-        const parsedHistory = JSON.parse(savedHistory);
-        if (
-          JSON.stringify(parsedHistory) !== JSON.stringify(contributionHistory)
-        ) {
-          setContributionHistory(parsedHistory);
+        // Check if user earned a new badge
+        if (newBadge.id > currentBadge.id) {
+          setHasNewBadge(true);
         }
+
+        setUserEXP(newEXP);
       }
     }, 1000); // Check every second
 
     return () => clearInterval(interval);
-  }, [userEXP, contributionHistory]);
+  }, [userEXP]);
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString("id-ID", {
@@ -137,27 +169,88 @@ export default function DashboardPage() {
     return date.toLocaleDateString("id-ID", { month: "short" }).toUpperCase();
   };
 
-  const formatRelativeTime = (timestamp: string) => {
-    const now = new Date();
-    const time = new Date(timestamp);
-    const diffInMinutes = Math.floor(
-      (now.getTime() - time.getTime()) / (1000 * 60)
+  // Badge system configuration
+  const badges = [
+    { id: 1, name: "Hijau Muda", minEXP: 0, maxEXP: 100, color: "#4CAF50" },
+    { id: 2, name: "Pemula Eco", minEXP: 101, maxEXP: 300, color: "#2196F3" },
+    {
+      id: 3,
+      name: "Penggerak Hijau",
+      minEXP: 301,
+      maxEXP: 600,
+      color: "#9C27B0",
+    },
+    {
+      id: 4,
+      name: "Pahlawan Bumi",
+      minEXP: 601,
+      maxEXP: 1000,
+      color: "#FF9800",
+    },
+    {
+      id: 5,
+      name: "Legenda Greevo",
+      minEXP: 1001,
+      maxEXP: Infinity,
+      color: "#8B4513",
+    },
+  ];
+
+  // Get current user badge
+  const getCurrentBadge = () => {
+    return (
+      badges.find(
+        (badge) => userEXP >= badge.minEXP && userEXP <= badge.maxEXP
+      ) || badges[0]
     );
-
-    if (diffInMinutes < 1) return "Baru saja";
-    if (diffInMinutes < 60) return `${diffInMinutes} menit lalu`;
-
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours} jam lalu`;
-
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays} hari lalu`;
-
-    return time.toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "short",
-    });
   };
+
+  // Handle badge modal close with animation
+  const handleCloseBadgeModal = () => {
+    setIsClosing(true);
+    // Mark badge as seen when modal is opened
+    setHasNewBadge(false);
+    setTimeout(() => {
+      setShowBadgeModal(false);
+      setIsClosing(false);
+    }, 300);
+  };
+
+  // Handle notification click
+  const handleNotificationClick = () => {
+    setHasNewNotifications(false); // Mark notifications as seen
+    localStorage.setItem("hasNewNotifications", "false");
+    router.push("/pages/dashboard/notifications");
+  };
+
+  // Handle badge click
+  const handleBadgeClick = () => {
+    setHasNewBadge(false); // Mark badge as seen
+    localStorage.setItem("hasNewBadge", "false");
+    setShowBadgeModal(true);
+  };
+
+  // Check if badge is earned
+  const isBadgeEarned = (badgeIndex: number) => {
+    const badge = badges[badgeIndex];
+    return userEXP >= badge.minEXP;
+  };
+
+  // Simulasi notifikasi baru setelah beberapa waktu untuk demo
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Hanya set notifikasi baru jika belum ada
+      const currentNotificationStatus = localStorage.getItem(
+        "hasNewNotifications"
+      );
+      if (currentNotificationStatus !== "true") {
+        setHasNewNotifications(true);
+        localStorage.setItem("hasNewNotifications", "true");
+      }
+    }, 30000); // 30 seconds untuk demo
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <MobilePageLayout showNavbar={true}>
@@ -169,8 +262,8 @@ export default function DashboardPage() {
         <div className="flex items-start justify-between mb-6">
           {/* Notification Icon */}
           <button
-            onClick={() => router.push("/pages/dashboard/notifications")}
-            className="flex items-center justify-center"
+            onClick={handleNotificationClick}
+            className="relative flex items-center justify-center"
             style={{
               width: "46px",
               height: "46px",
@@ -190,6 +283,20 @@ export default function DashboardPage() {
                 fill="white"
               />
             </svg>
+            {/* Red notification dot */}
+            {hasNewNotifications && (
+              <div
+                className="absolute bg-red-500 rounded-full animate-pulse"
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  top: "4px",
+                  right: "4px",
+                  border: "2px solid white",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                }}
+              />
+            )}
           </button>
 
           {/* Profile Section */}
@@ -203,18 +310,33 @@ export default function DashboardPage() {
                 height={76}
                 className="rounded-full"
               />
-              {/* Badge Logo */}
+              {/* Badge Logo - Dynamic based on user's highest earned badge */}
               <button
-                onClick={() => setShowBadgeModal(true)}
-                className="absolute -bottom-2 -right-2"
+                onClick={handleBadgeClick}
+                className="absolute -bottom-2 -right-2 transition-transform active:scale-95"
                 style={{ width: "32px", height: "32px" }}
               >
                 <Image
-                  src="/pages/dashboard/logo-lencana.svg"
+                  src={`/pages/dashboard/lencana-${getCurrentBadge().id}.svg`}
                   alt="Lencana"
                   width={32}
                   height={32}
+                  className="drop-shadow-lg"
                 />
+                {/* Red badge notification dot */}
+                {hasNewBadge && (
+                  <div
+                    className="absolute bg-red-500 rounded-full animate-pulse"
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      top: "-2px",
+                      right: "-2px",
+                      border: "1px solid white",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                    }}
+                  />
+                )}
               </button>
             </div>
           </div>
@@ -276,6 +398,7 @@ export default function DashboardPage() {
             </button>
           </div>
           <button
+            onClick={() => router.push("/pages/dashboard/history")}
             className="w-full bg-white font-medium flex items-center justify-center"
             style={{
               height: "33px",
@@ -286,87 +409,6 @@ export default function DashboardPage() {
             Jejak hijau
           </button>
         </div>
-
-        {/* Recent Contributions Section */}
-        {contributionHistory.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3
-                className="text-lg font-semibold"
-                style={{ color: "#213813" }}
-              >
-                Kontribusi Terbaru
-              </h3>
-              {contributionHistory.length > 0 && (
-                <span className="text-sm text-gray-500">
-                  Total:{" "}
-                  {contributionHistory.reduce((sum, item) => sum + item.exp, 0)}{" "}
-                  EXP
-                </span>
-              )}
-            </div>
-            <div className="space-y-2">
-              {contributionHistory
-                .slice(0, 3)
-                .map((contribution: any, index: number) => (
-                  <div
-                    key={contribution.id}
-                    className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <span className="text-lg">
-                          {contribution.activityTitle === "Buang Sampah"
-                            ? "🗑️"
-                            : contribution.activityTitle === "Pakai Tumbler"
-                            ? "🥤"
-                            : contribution.activityTitle === "Tanam tanaman"
-                            ? "🌱"
-                            : contribution.activityTitle ===
-                              "Belanja tanpa plastik"
-                            ? "🛍️"
-                            : contribution.activityTitle ===
-                              "Jalan kaki atau bersepeda"
-                            ? "🚶"
-                            : contribution.activityTitle ===
-                              "Gunakan transportasi umum"
-                            ? "🚌"
-                            : "🌱"}
-                        </span>
-                        <p
-                          className="font-medium text-sm"
-                          style={{ color: "#213813" }}
-                        >
-                          {contribution.activityTitle}
-                        </p>
-                      </div>
-                      <p className="text-xs text-gray-500">
-                        {formatRelativeTime(contribution.timestamp)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <span
-                        className="text-lg font-bold"
-                        style={{ color: "#5C754D" }}
-                      >
-                        +{contribution.exp}
-                      </span>
-                      <p className="text-xs text-gray-500">EXP</p>
-                    </div>
-                  </div>
-                ))}
-            </div>
-            {contributionHistory.length > 3 && (
-              <button
-                onClick={() => router.push("/pages/dashboard/contribution")}
-                className="text-sm font-medium transition-colors hover:underline"
-                style={{ color: "#5C754D" }}
-              >
-                Lihat semua kontribusi →
-              </button>
-            )}
-          </div>
-        )}
 
         {/* Two Cards Section */}
         <div className="flex space-x-4">
@@ -467,6 +509,12 @@ export default function DashboardPage() {
               <br />
               Kontribusi
             </h3>
+            <button
+              onClick={() => router.push("/pages/dashboard/history")}
+              className="text-sm text-white underline opacity-80 hover:opacity-100"
+            >
+              Lihat Detail →
+            </button>
           </div>
           <div className="relative">
             {/* Circular Progress Bar */}
@@ -491,7 +539,7 @@ export default function DashboardPage() {
                   strokeWidth="8"
                   fill="transparent"
                   strokeDasharray={`${
-                    (contributionHistory.length / 10) * 408.4
+                    Math.min(userEXP / 2000, 1) * 408.4
                   } 408.4`}
                   strokeLinecap="round"
                 />
@@ -500,7 +548,7 @@ export default function DashboardPage() {
                 className="absolute inset-0 flex items-center justify-center text-4xl font-bold"
                 style={{ color: "#213813" }}
               >
-                {contributionHistory.length}
+                {Math.floor(userEXP / 20)}
               </div>
             </div>
           </div>
@@ -508,13 +556,33 @@ export default function DashboardPage() {
 
         {/* Badge Modal */}
         {showBadgeModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-6 w-full max-w-sm mx-4">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Lencana Anda</h3>
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end justify-center">
+            <div
+              className={`bg-white w-full mx-4 mb-4 rounded-t-3xl transition-all duration-300 ease-out transform flex flex-col ${
+                isClosing
+                  ? "translate-y-full opacity-0"
+                  : "translate-y-0 opacity-100"
+              }`}
+              style={{
+                maxWidth: "390px",
+                height: "80vh",
+                animation: isClosing
+                  ? "slideDown 0.3s ease-out"
+                  : "slideUp 0.3s ease-out",
+              }}
+            >
+              {/* Header */}
+              <div className="flex justify-between items-center p-6 border-b border-gray-200 flex-shrink-0">
+                <h3
+                  className="text-xl font-semibold"
+                  style={{ color: "#213813" }}
+                >
+                  Lencana
+                </h3>
                 <button
-                  onClick={() => setShowBadgeModal(false)}
-                  className="text-gray-500"
+                  onClick={handleCloseBadgeModal}
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  style={{ color: "#213813" }}
                 >
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path
@@ -526,23 +594,132 @@ export default function DashboardPage() {
                   </svg>
                 </button>
               </div>
-              <div className="grid grid-cols-3 gap-4">
-                {[1, 2, 3, 4, 5].map((badge, index) => (
-                  <div key={badge} className="text-center">
-                    <Image
-                      src={`/pages/dashboard/lencana-${badge}.svg`}
-                      alt={`Lencana ${badge}`}
-                      width={60}
-                      height={60}
-                      className={userEXP < badge * 100 ? "grayscale" : ""}
-                    />
-                    <p className="text-xs mt-1">Level {badge}</p>
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto">
+                {/* Badge Grid */}
+                <div className="p-6">
+                  <div className="grid grid-cols-2 gap-8 justify-items-center">
+                    {badges.map((badge, index) => (
+                      <div
+                        key={badge.id}
+                        className="flex flex-col items-center"
+                        style={{
+                          width: "132px",
+                          minHeight: "180px",
+                        }}
+                      >
+                        {/* Badge Image Container */}
+                        <div className="relative mb-3">
+                          <Image
+                            src={`/pages/dashboard/lencana-${badge.id}.svg`}
+                            alt={badge.name}
+                            width={80}
+                            height={80}
+                            className={`transition-all duration-300 ${
+                              isBadgeEarned(index)
+                                ? "opacity-100 saturate-100"
+                                : "opacity-50 saturate-0 grayscale"
+                            }`}
+                          />
+                          {/* Badge Achievement Indicator */}
+                          {isBadgeEarned(index) && (
+                            <div className="absolute -top-2 -right-2 bg-green-500 rounded-full p-1">
+                              <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="white"
+                              >
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Badge Name */}
+                        <h4
+                          className={`text-sm font-medium text-center mb-1 ${
+                            isBadgeEarned(index)
+                              ? "text-gray-900"
+                              : "text-gray-400"
+                          }`}
+                          style={{
+                            fontSize: "12px",
+                            color: isBadgeEarned(index) ? "#213813" : "#9CA3AF",
+                          }}
+                        >
+                          {badge.name}
+                        </h4>
+
+                        {/* EXP Range */}
+                        <p
+                          className={`text-xs text-center mb-2 ${
+                            isBadgeEarned(index)
+                              ? "text-gray-600"
+                              : "text-gray-400"
+                          }`}
+                          style={{ fontSize: "10px" }}
+                        >
+                          {badge.minEXP === 0
+                            ? `0-${badge.maxEXP} EXP`
+                            : badge.maxEXP === Infinity
+                            ? `${badge.minEXP}+ EXP`
+                            : `${badge.minEXP}-${badge.maxEXP} EXP`}
+                        </p>
+
+                        {/* Progress Bar for Current Badge */}
+                        {getCurrentBadge().id === badge.id &&
+                          userEXP < badge.maxEXP && (
+                            <div className="w-full mt-4">
+                              <div className="bg-gray-200 rounded-full h-1.5">
+                                <div
+                                  className="bg-green-500 h-1.5 rounded-full transition-all duration-500"
+                                  style={{
+                                    width: `${Math.min(
+                                      ((userEXP - badge.minEXP) /
+                                        (badge.maxEXP - badge.minEXP)) *
+                                        100,
+                                      100
+                                    )}%`,
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
             </div>
           </div>
         )}
+
+        {/* Add CSS for animations */}
+        <style jsx>{`
+          @keyframes slideUp {
+            from {
+              transform: translateY(100%);
+              opacity: 0;
+            }
+            to {
+              transform: translateY(0);
+              opacity: 1;
+            }
+          }
+
+          @keyframes slideDown {
+            from {
+              transform: translateY(0);
+              opacity: 1;
+            }
+            to {
+              transform: translateY(100%);
+              opacity: 0;
+            }
+          }
+        `}</style>
       </div>
     </MobilePageLayout>
   );

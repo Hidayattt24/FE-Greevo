@@ -2,6 +2,11 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { MobilePageLayout } from "@/components";
+import {
+  predefinedQuestions,
+  botResponses,
+  defaultResponse,
+} from "@/data/chatbot";
 
 interface Message {
   id: number;
@@ -10,32 +15,11 @@ interface Message {
   timestamp: Date;
 }
 
-const predefinedQuestions = [
-  "Bagaimana cara memilah sampah yang benar?",
-  "Apa saja jenis plastik yang bisa didaur ulang?",
-  "Tips mengurangi sampah di rumah",
-  "Cara membuat kompos dari sampah organik",
-];
-
-const botResponses: { [key: string]: string } = {
-  "bagaimana cara memilah sampah yang benar":
-    "Untuk memilah sampah yang benar:\n\n1. **Sampah Organik**: Sisa makanan, daun, kulit buah\n2. **Plastik**: Botol, kemasan, kantong plastik\n3. **Kertas**: Koran, kardus, kertas bekas\n4. **Logam**: Kaleng, tutup botol\n5. **Kaca**: Botol kaca, pecahan kaca\n\nPastikan sampah dalam kondisi bersih sebelum dibuang ke tempat yang sesuai!",
-
-  "apa saja jenis plastik yang bisa didaur ulang":
-    "Jenis plastik yang bisa didaur ulang berdasarkan kode:\n\n♻️ **Kode 1 (PET)**: Botol minuman\n♻️ **Kode 2 (HDPE)**: Botol deterjen, shampoo\n♻️ **Kode 4 (LDPE)**: Kantong plastik\n♻️ **Kode 5 (PP)**: Wadah makanan\n\n❌ **Hindari**: Plastik kode 3, 6, 7 karena sulit didaur ulang dan mengandung bahan berbahaya.",
-
-  "tips mengurangi sampah di rumah":
-    "Tips mengurangi sampah di rumah:\n\n🛒 **Belanja bijak**: Bawa tas belanja sendiri\n🥤 **Gunakan botol isi ulang**: Hindari botol sekali pakai\n📦 **Pilih kemasan minimal**: Beli produk dengan kemasan sederhana\n🍃 **Kompos organik**: Olah sisa makanan jadi kompos\n♻️ **Daur ulang**: Manfaatkan kembali barang bekas\n💡 **Repair, don't replace**: Perbaiki barang rusak",
-
-  "cara membuat kompos dari sampah organik":
-    "Cara membuat kompos mudah:\n\n📦 **Siapkan wadah**: Ember atau komposter\n🍃 **Bahan hijau**: Sisa sayuran, kulit buah\n🍂 **Bahan coklat**: Daun kering, kertas\n💧 **Siram secukupnya**: Jaga kelembaban\n🔄 **Aduk rutin**: Seminggu sekali\n⏰ **Tunggu 2-3 bulan**: Kompos siap digunakan!\n\nHasil kompos bisa untuk pupuk tanaman di rumah! 🌱",
-};
-
 export default function ChatbotPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Halo! Saya EcoBot, asisten virtual Greevo. Saya siap membantu Anda dengan pertanyaan seputar lingkungan dan pengelolaan sampah. Ada yang ingin Anda tanyakan? 🌱",
+      text: "Hi, jika ada kebingungan mari chat dengan kami 🌱",
       isUser: false,
       timestamp: new Date(),
     },
@@ -88,7 +72,7 @@ export default function ChatbotPage() {
     }
 
     // Respons default
-    return "Maaf, saya belum bisa menjawab pertanyaan itu dengan baik. Tapi saya bisa membantu Anda dengan:\n\n• Cara memilah sampah\n• Jenis plastik yang bisa didaur ulang\n• Tips mengurangi sampah\n• Cara membuat kompos\n\nSilakan pilih salah satu topik di atas atau ajukan pertanyaan lain seputar lingkungan! 🌿";
+    return defaultResponse;
   };
 
   const handleSendMessage = async (text: string) => {
@@ -131,8 +115,18 @@ export default function ChatbotPage() {
   };
 
   return (
-    <MobilePageLayout title="EcoBot Assistant">
-      <div className="flex flex-col h-[calc(100vh-140px)]">
+    <MobilePageLayout>
+      <div
+        className="flex flex-col h-[calc(100vh-140px)]"
+        style={{ fontFamily: "Poppins, sans-serif" }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-center py-6 px-4 bg-white">
+          <h1 className="text-xl font-semibold" style={{ color: "#213813" }}>
+            Greevo Chat
+          </h1>
+        </div>
+
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((message) => (
@@ -144,10 +138,11 @@ export default function ChatbotPage() {
             >
               <div
                 className={`max-w-[75%] rounded-2xl px-4 py-3 ${
-                  message.isUser
-                    ? "bg-green-500 text-white"
-                    : "bg-gray-100 text-gray-800"
+                  message.isUser ? "text-white" : "bg-gray-100 text-gray-800"
                 }`}
+                style={{
+                  backgroundColor: message.isUser ? "#213813" : undefined,
+                }}
               >
                 <p className="text-sm whitespace-pre-line">{message.text}</p>
                 <p
@@ -166,14 +161,23 @@ export default function ChatbotPage() {
             <div className="flex justify-start">
               <div className="bg-gray-100 rounded-2xl px-4 py-3">
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                   <div
-                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                    style={{ animationDelay: "0.1s" }}
+                    className="w-2 h-2 rounded-full animate-bounce"
+                    style={{ backgroundColor: "#213813" }}
                   ></div>
                   <div
-                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                    style={{ animationDelay: "0.2s" }}
+                    className="w-2 h-2 rounded-full animate-bounce"
+                    style={{
+                      backgroundColor: "#213813",
+                      animationDelay: "0.1s",
+                    }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 rounded-full animate-bounce"
+                    style={{
+                      backgroundColor: "#213813",
+                      animationDelay: "0.2s",
+                    }}
                   ></div>
                 </div>
               </div>
@@ -185,8 +189,8 @@ export default function ChatbotPage() {
 
         {/* Quick Questions */}
         {messages.length <= 1 && (
-          <div className="p-4 border-t border-gray-200">
-            <p className="text-sm text-gray-600 mb-3">
+          <div className="p-4">
+            <p className="text-sm mb-3" style={{ color: "#606060" }}>
               Pertanyaan yang sering ditanyakan:
             </p>
             <div className="space-y-2">
@@ -194,7 +198,8 @@ export default function ChatbotPage() {
                 <button
                   key={index}
                   onClick={() => handleQuickQuestion(question)}
-                  className="w-full text-left p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors text-sm"
+                  className="w-full text-left p-3 text-white rounded-lg border-none hover:opacity-90 transition-colors text-sm"
+                  style={{ backgroundColor: "#213813" }}
                 >
                   {question}
                 </button>
@@ -204,7 +209,7 @@ export default function ChatbotPage() {
         )}
 
         {/* Input Area */}
-        <div className="p-4 border-t border-gray-200 bg-white">
+        <div className="p-4 bg-white">
           <div className="flex items-center space-x-3">
             <div className="flex-1 relative">
               <input
@@ -218,14 +223,18 @@ export default function ChatbotPage() {
                   }
                 }}
                 placeholder="Ketik pertanyaan Anda..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-[#213813] text-[#213813] placeholder-[#213813]"
                 disabled={isTyping}
               />
             </div>
             <button
               onClick={() => handleSendMessage(inputText)}
               disabled={!inputText.trim() || isTyping}
-              className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center hover:bg-green-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+              className="w-12 h-12 text-white rounded-full flex items-center justify-center hover:opacity-90 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor:
+                  !inputText.trim() || isTyping ? "#9CA3AF" : "#213813",
+              }}
             >
               <svg
                 width="20"
