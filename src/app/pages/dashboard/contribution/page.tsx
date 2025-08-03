@@ -156,6 +156,28 @@ export default function ContributionPage() {
       return;
     }
 
+    // Add EXP to localStorage for testing
+    const currentEXP = parseInt(localStorage.getItem("userEXP") || "0");
+    const newEXP = currentEXP + selectedActivity.exp;
+    localStorage.setItem("userEXP", newEXP.toString());
+
+    // Add to contribution history
+    const contributionHistory = JSON.parse(
+      localStorage.getItem("contributionHistory") || "[]"
+    );
+    const newContribution = {
+      id: Date.now(),
+      activityTitle: selectedActivity.title,
+      exp: selectedActivity.exp,
+      timestamp: new Date().toISOString(),
+      photo: capturedPhoto,
+    };
+    contributionHistory.unshift(newContribution); // Add to beginning
+    localStorage.setItem(
+      "contributionHistory",
+      JSON.stringify(contributionHistory)
+    );
+
     triggerConfetti();
     // Stop camera stream
     if (stream) {
@@ -165,19 +187,21 @@ export default function ContributionPage() {
 
     setTimeout(() => {
       handleCloseCameraOverlay();
+      // Show success message
+      alert(
+        `Selamat! Anda mendapat +${selectedActivity.exp} EXP dari aktivitas "${selectedActivity.title}"`
+      );
       // Here you can send the photo to backend
       console.log("Photo captured for activity:", selectedActivity.title);
       console.log("Photo data:", capturedPhoto);
+      console.log("EXP earned:", selectedActivity.exp);
     }, 2000); // Show confetti for 2 seconds before closing
   };
 
   // Retry photo capture
   const retryPhoto = () => {
     setCapturedPhoto(null);
-    // Restart camera if stream was stopped
-    if (!stream) {
-      startCamera();
-    }
+    // Camera stream should still be active, no need to restart
   };
 
   // EXP activities data
@@ -660,38 +684,19 @@ export default function ContributionPage() {
 
                     {/* Camera UI Overlay */}
                     <div className="absolute inset-0 flex flex-col">
-                      {/* Top overlay with close button */}
+                      {/* Top overlay - removed close button since there's already one in header */}
                       <div className="flex justify-end p-3">
-                        <button
-                          onClick={handleCloseCameraOverlay}
-                          className="w-8 h-8 bg-black bg-opacity-50 rounded-full flex items-center justify-center"
-                        >
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M18 6L6 18M6 6L18 18"
-                              stroke="white"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </button>
+                        {/* Removed redundant close button */}
                       </div>
 
                       {/* Center guide overlay */}
                       <div className="flex-1 flex items-center justify-center">
-                        {/* Removed border guide for cleaner camera view */}
+                        {/* Clean camera view without guides */}
                       </div>
 
-                      {/* Bottom controls - removed redundant button */}
+                      {/* Bottom controls */}
                       <div className="p-4 flex justify-center">
-                        {/* Button removed - using bottom action button instead */}
+                        {/* Controls moved to bottom action area */}
                       </div>
                     </div>
                   </>
