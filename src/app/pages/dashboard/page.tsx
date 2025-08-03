@@ -10,11 +10,11 @@ export default function DashboardPage() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showEXP, setShowEXP] = useState(false);
   const [showBadgeModal, setShowBadgeModal] = useState(false);
+  const [userEXP, setUserEXP] = useState(0);
+  const [contributionHistory, setContributionHistory] = useState<any[]>([]);
 
   // Sample data
   const username = "Username";
-  const currentEXP = 0;
-  const totalContribution = 0;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -23,6 +23,103 @@ export default function DashboardPage() {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Load EXP from localStorage
+  useEffect(() => {
+    const savedEXP = localStorage.getItem("userEXP");
+    if (savedEXP) {
+      setUserEXP(parseInt(savedEXP));
+    } else {
+      // Set dummy initial EXP for testing
+      setUserEXP(50);
+      localStorage.setItem("userEXP", "50");
+    }
+
+    const savedHistory = localStorage.getItem("contributionHistory");
+    if (savedHistory) {
+      setContributionHistory(JSON.parse(savedHistory));
+    } else {
+      // Set dummy initial contribution history for testing
+      const dummyHistory = [
+        {
+          id: 1,
+          activityTitle: "Buang Sampah",
+          exp: 10,
+          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+          photo: null,
+        },
+        {
+          id: 2,
+          activityTitle: "Pakai Tumbler",
+          exp: 15,
+          timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+          photo: null,
+        },
+      ];
+      setContributionHistory(dummyHistory);
+      localStorage.setItem("contributionHistory", JSON.stringify(dummyHistory));
+    }
+  }, []);
+
+  // Update EXP when page becomes visible (when user returns from contribution page)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        const savedEXP = localStorage.getItem("userEXP");
+        if (savedEXP) {
+          setUserEXP(parseInt(savedEXP));
+        }
+
+        const savedHistory = localStorage.getItem("contributionHistory");
+        if (savedHistory) {
+          setContributionHistory(JSON.parse(savedHistory));
+        }
+      }
+    };
+
+    const handleFocus = () => {
+      // Also update when window gets focus (user returns to tab)
+      const savedEXP = localStorage.getItem("userEXP");
+      if (savedEXP) {
+        setUserEXP(parseInt(savedEXP));
+      }
+
+      const savedHistory = localStorage.getItem("contributionHistory");
+      if (savedHistory) {
+        setContributionHistory(JSON.parse(savedHistory));
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, []);
+
+  // Polling untuk update data secara berkala
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const savedEXP = localStorage.getItem("userEXP");
+      if (savedEXP && parseInt(savedEXP) !== userEXP) {
+        setUserEXP(parseInt(savedEXP));
+      }
+
+      const savedHistory = localStorage.getItem("contributionHistory");
+      if (savedHistory) {
+        const parsedHistory = JSON.parse(savedHistory);
+        if (
+          JSON.stringify(parsedHistory) !== JSON.stringify(contributionHistory)
+        ) {
+          setContributionHistory(parsedHistory);
+        }
+      }
+    }, 1000); // Check every second
+
+    return () => clearInterval(interval);
+  }, [userEXP, contributionHistory]);
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString("id-ID", {
@@ -38,6 +135,28 @@ export default function DashboardPage() {
 
   const formatMonth = (date: Date) => {
     return date.toLocaleDateString("id-ID", { month: "short" }).toUpperCase();
+  };
+
+  const formatRelativeTime = (timestamp: string) => {
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diffInMinutes = Math.floor(
+      (now.getTime() - time.getTime()) / (1000 * 60)
+    );
+
+    if (diffInMinutes < 1) return "Baru saja";
+    if (diffInMinutes < 60) return `${diffInMinutes} menit lalu`;
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours} jam lalu`;
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays} hari lalu`;
+
+    return time.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+    });
   };
 
   return (
@@ -123,13 +242,17 @@ export default function DashboardPage() {
         >
           <p className="text-sm font-normal mb-2">Jumlah saldo EXP terkumpul</p>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-4xl font-bold">
-              {showEXP ? `EXP ${currentEXP}` : "EXP ****"}
+            <h2
+              className={`text-4xl font-bold transition-all duration-500 ${
+                showEXP ? "opacity-100" : "opacity-100"
+              }`}
+            >
+              {showEXP ? `EXP ${userEXP}` : "EXP ****"}
             </h2>
             {/* Hide/Show EXP Button - positioned inline with EXP text */}
             <button
               onClick={() => setShowEXP(!showEXP)}
-              className="text-white ml-4"
+              className="text-white ml-4 transition-transform active:scale-95"
             >
               <svg
                 width="24"
@@ -163,6 +286,87 @@ export default function DashboardPage() {
             Jejak hijau
           </button>
         </div>
+
+        {/* Recent Contributions Section */}
+        {contributionHistory.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: "#213813" }}
+              >
+                Kontribusi Terbaru
+              </h3>
+              {contributionHistory.length > 0 && (
+                <span className="text-sm text-gray-500">
+                  Total:{" "}
+                  {contributionHistory.reduce((sum, item) => sum + item.exp, 0)}{" "}
+                  EXP
+                </span>
+              )}
+            </div>
+            <div className="space-y-2">
+              {contributionHistory
+                .slice(0, 3)
+                .map((contribution: any, index: number) => (
+                  <div
+                    key={contribution.id}
+                    className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="text-lg">
+                          {contribution.activityTitle === "Buang Sampah"
+                            ? "🗑️"
+                            : contribution.activityTitle === "Pakai Tumbler"
+                            ? "🥤"
+                            : contribution.activityTitle === "Tanam tanaman"
+                            ? "🌱"
+                            : contribution.activityTitle ===
+                              "Belanja tanpa plastik"
+                            ? "🛍️"
+                            : contribution.activityTitle ===
+                              "Jalan kaki atau bersepeda"
+                            ? "🚶"
+                            : contribution.activityTitle ===
+                              "Gunakan transportasi umum"
+                            ? "🚌"
+                            : "🌱"}
+                        </span>
+                        <p
+                          className="font-medium text-sm"
+                          style={{ color: "#213813" }}
+                        >
+                          {contribution.activityTitle}
+                        </p>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        {formatRelativeTime(contribution.timestamp)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <span
+                        className="text-lg font-bold"
+                        style={{ color: "#5C754D" }}
+                      >
+                        +{contribution.exp}
+                      </span>
+                      <p className="text-xs text-gray-500">EXP</p>
+                    </div>
+                  </div>
+                ))}
+            </div>
+            {contributionHistory.length > 3 && (
+              <button
+                onClick={() => router.push("/pages/dashboard/contribution")}
+                className="text-sm font-medium transition-colors hover:underline"
+                style={{ color: "#5C754D" }}
+              >
+                Lihat semua kontribusi →
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Two Cards Section */}
         <div className="flex space-x-4">
@@ -286,7 +490,9 @@ export default function DashboardPage() {
                   stroke="#213813"
                   strokeWidth="8"
                   fill="transparent"
-                  strokeDasharray={`${(totalContribution / 100) * 408.4} 408.4`}
+                  strokeDasharray={`${
+                    (contributionHistory.length / 10) * 408.4
+                  } 408.4`}
                   strokeLinecap="round"
                 />
               </svg>
@@ -294,7 +500,7 @@ export default function DashboardPage() {
                 className="absolute inset-0 flex items-center justify-center text-4xl font-bold"
                 style={{ color: "#213813" }}
               >
-                {totalContribution}
+                {contributionHistory.length}
               </div>
             </div>
           </div>
@@ -328,7 +534,7 @@ export default function DashboardPage() {
                       alt={`Lencana ${badge}`}
                       width={60}
                       height={60}
-                      className={currentEXP < badge * 100 ? "grayscale" : ""}
+                      className={userEXP < badge * 100 ? "grayscale" : ""}
                     />
                     <p className="text-xs mt-1">Level {badge}</p>
                   </div>
