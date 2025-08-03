@@ -12,7 +12,12 @@ export default function ContributionPage() {
   const [isClosing, setIsClosing] = useState(false);
   const [showCameraOverlay, setShowCameraOverlay] = useState(false);
   const [isCameraClosing, setIsCameraClosing] = useState(false);
-  const [selectedActivity, setSelectedActivity] = useState<any>(null);
+  const [selectedActivity, setSelectedActivity] = useState<{
+    id: number;
+    title: string;
+    exp: number;
+    icon: string;
+  } | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
@@ -96,7 +101,12 @@ export default function ContributionPage() {
   };
 
   // Handle activity card click
-  const handleActivityClick = (activity: any) => {
+  const handleActivityClick = (activity: {
+    id: number;
+    title: string;
+    exp: number;
+    icon: string;
+  }) => {
     setSelectedActivity(activity);
     setShowCameraOverlay(true);
   };
@@ -151,7 +161,7 @@ export default function ContributionPage() {
 
   // Handle photo capture success
   const handlePhotoSuccess = () => {
-    if (!capturedPhoto) {
+    if (!capturedPhoto || !selectedActivity) {
       alert("Silakan ambil foto terlebih dahulu!");
       return;
     }
@@ -370,9 +380,9 @@ export default function ContributionPage() {
               lineHeight: "1.2",
             }}
           >
-            "Mulai dari kamu,
+            &quot;Mulai dari kamu,
             <br />
-            untuk bumi kita bersama "
+            untuk bumi kita bersama&quot;
           </p>
         </div>
 
@@ -766,7 +776,8 @@ export default function ContributionPage() {
                 {!capturedPhoto ? (
                   <div className="text-center">
                     <p className="text-sm text-gray-600 mb-3">
-                      Ambil foto bukti kegiatan "{selectedActivity.title}"
+                      Ambil foto bukti kegiatan &quot;{selectedActivity.title}
+                      &quot;
                     </p>
                     <button
                       onClick={capturePhoto}

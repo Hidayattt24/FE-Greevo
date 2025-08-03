@@ -4,7 +4,7 @@ import { ROUTES, TIMING } from "@/lib/constants";
 import { delay } from "@/lib/utils";
 
 export const useSplashScreen = () => {
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const router = useRouter();
 

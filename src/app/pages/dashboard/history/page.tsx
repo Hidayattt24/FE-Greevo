@@ -9,7 +9,15 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function HistoryPage() {
   const router = useRouter();
-  const [contributionHistory, setContributionHistory] = useState<any[]>([]);
+  const [contributionHistory, setContributionHistory] = useState<
+    {
+      id: number;
+      activityTitle: string;
+      exp: number;
+      timestamp: string;
+      photo: string;
+    }[]
+  >([]);
 
   // Load contribution history from localStorage
   useEffect(() => {
@@ -125,7 +133,7 @@ export default function HistoryPage() {
               >
                 Riwayat Aktivitas
               </h3>
-              {contributionHistory.map((contribution: any, index: number) => (
+              {contributionHistory.map((contribution, index) => (
                 <div
                   key={contribution.id}
                   className="flex items-center p-4 bg-white rounded-xl border border-gray-100 shadow-sm"

@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MobilePageLayout, MobileNavbar } from "@/components";
+import { MobileNavbar } from "@/components";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [profile, setProfile] = useState({
+  const [profile] = useState({
     name: "Username",
     email: "username@gmail.com",
     photo: "/pages/dashboard/foto-profile.svg",

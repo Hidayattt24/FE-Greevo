@@ -1,13 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import SegmentedControl from "@/components/SegmentedControl";
 import { locations } from "@/data/locations";
 
 export default function AuthenticationPage() {
   const [selectedTab, setSelectedTab] = useState(0); // 0 = Masuk (default dari get-started)
-  const router = useRouter();
 
   // Login state
   const [loginData, setLoginData] = useState({

@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import ProgressBar from "@/components/ProgressBar";
 import { slides, ROUTES, TIMING } from "@/lib/constants";
-import { SlideData } from "@/types";
 
 export default function GetStarted() {
   const [currentSlide, setCurrentSlide] = useState(0);
