@@ -45,7 +45,10 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="fixed inset-0 overflow-hidden">
+    <div
+      className="min-h-screen overflow-y-auto bg-white text-gray-900"
+      style={{ backgroundColor: "#ffffff", color: "#171717" }}
+    >
       {/* Header Section with Profile - Full Width */}
       <div
         className="relative px-6 pt-4 pb-16"
@@ -81,7 +84,10 @@ export default function ProfilePage() {
       </div>
 
       {/* White Content Area */}
-      <div className="bg-gray-50 mx-4 -mt-8 rounded-t-3xl px-6 pt-8 pb-32 relative z-10">
+      <div
+        className="bg-gray-50 mx-4 -mt-8 rounded-t-3xl px-6 pt-8 pb-32 relative z-10"
+        style={{ backgroundColor: "#f9fafb" }}
+      >
         {/* Action Cards Grid - Dashboard Style */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           {profileCards.map((card) => (
@@ -145,7 +151,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Mobile Navbar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50">
+      <div className="sticky bottom-0 left-0 right-0 z-50">
         <MobileNavbar />
       </div>
     </div>

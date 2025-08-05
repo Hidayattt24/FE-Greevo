@@ -630,8 +630,9 @@ export default function ContributionPage() {
                 !isCameraClosing && showCameraOverlay
                   ? "slideUpCurve 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
                   : "",
-              height: "70vh",
-              maxHeight: "600px",
+              height: "500px",
+              maxHeight: "500px",
+              overflowY: "auto",
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -672,8 +673,13 @@ export default function ContributionPage() {
             <div className="flex-1 flex flex-col">
               {/* Camera View */}
               <div
-                className="flex-1 mx-4 mt-4 rounded-2xl relative overflow-hidden"
-                style={{ backgroundColor: "#000" }}
+                className="mx-4 mt-4 rounded-2xl relative overflow-hidden"
+                style={{
+                  backgroundColor: "#000",
+                  height: "280px",
+                  minHeight: "280px",
+                  maxHeight: "280px",
+                }}
               >
                 {!capturedPhoto ? (
                   <>
