@@ -21,6 +21,9 @@ export default function ContributionPage() {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [facingMode, setFacingMode] = useState<"user" | "environment">(
+    "environment"
+  );
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -53,11 +56,16 @@ export default function ContributionPage() {
   };
 
   // Start camera when overlay opens
-  const startCamera = async () => {
+  const startCamera = async (faceMode = facingMode) => {
     try {
+      // Stop existing stream first
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: "environment", // Use back camera on mobile
+          facingMode: faceMode,
           width: { ideal: 1280 },
           height: { ideal: 720 },
         },
@@ -88,8 +96,19 @@ export default function ContributionPage() {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
 
+      // If using front camera, mirror the captured image
+      if (facingMode === "user") {
+        context.translate(canvas.width, 0);
+        context.scale(-1, 1);
+      }
+
       // Draw video frame to canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Reset transformation for future use
+      if (facingMode === "user") {
+        context.setTransform(1, 0, 0, 1, 0, 0);
+      }
 
       // Convert to data URL
       const photoDataUrl = canvas.toDataURL("image/jpeg", 0.8);
@@ -98,6 +117,13 @@ export default function ContributionPage() {
       // Add camera flash effect
       setTimeout(() => setIsCapturing(false), 200);
     }
+  };
+
+  // Flip camera function
+  const flipCamera = () => {
+    const newFacingMode = facingMode === "environment" ? "user" : "environment";
+    setFacingMode(newFacingMode);
+    startCamera(newFacingMode);
   };
 
   // Handle activity card click
@@ -690,7 +716,10 @@ export default function ContributionPage() {
                       playsInline
                       muted
                       className="w-full h-full object-cover"
-                      style={{ transform: "scaleX(-1)" }} // Mirror effect
+                      style={{
+                        transform:
+                          facingMode === "user" ? "scaleX(-1)" : "scaleX(1)",
+                      }}
                     />
 
                     {/* Camera flash overlay */}
@@ -700,9 +729,48 @@ export default function ContributionPage() {
 
                     {/* Camera UI Overlay */}
                     <div className="absolute inset-0 flex flex-col">
-                      {/* Top overlay - removed close button since there's already one in header */}
-                      <div className="flex justify-end p-3">
-                        {/* Removed redundant close button */}
+                      {/* Top overlay with flip camera button */}
+                      <div className="flex justify-between items-center p-3">
+                        {/* Flip Camera Button */}
+                        <button
+                          onClick={flipCamera}
+                          className="p-2 rounded-full text-white hover:opacity-80 transition-all"
+                          style={{ backgroundColor: "#213813" }}
+                          title="Flip Camera"
+                        >
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M20 5H16L14 3H10L8 5H4C2.9 5 2 5.9 2 7V19C2 20.1 2.9 21 4 21H20C21.1 21 22 20.1 22 19V7C22 5.9 21.1 5 20 5ZM20 19H4V7H20V19Z"
+                              fill="currentColor"
+                            />
+                            <path
+                              d="M9 14.5L11 16.5L13 14.5V12.5H9V14.5Z"
+                              fill="currentColor"
+                            />
+                            <path
+                              d="M15 9.5L13 7.5L11 9.5V11.5H15V9.5Z"
+                              fill="currentColor"
+                            />
+                          </svg>
+                        </button>
+
+                        {/* Camera mode indicator */}
+                        <div
+                          className="px-2 py-1 rounded-full"
+                          style={{ backgroundColor: "#213813" }}
+                        >
+                          <span className="text-white text-xs">
+                            {facingMode === "environment"
+                              ? "Belakang"
+                              : "Depan"}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Center guide overlay */}
