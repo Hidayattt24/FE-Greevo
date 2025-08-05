@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import SegmentedControl from "@/components/SegmentedControl";
 import { locations } from "@/data/locations";
 
 export default function AuthenticationPage() {
+  const router = useRouter();
   const [selectedTab, setSelectedTab] = useState(0); // 0 = Masuk (default dari get-started)
 
   // Login state
@@ -94,6 +96,9 @@ export default function AuthenticationPage() {
     }
 
     console.log("Login attempt:", loginData);
+
+    // Redirect to dashboard after successful login
+    router.push("/pages/dashboard");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -145,6 +150,9 @@ export default function AuthenticationPage() {
 
     // Handle register logic here
     console.log("Register attempt:", { ...formData, agreeTerms });
+
+    // Redirect to dashboard after successful registration
+    router.push("/pages/dashboard");
   };
 
   return (
